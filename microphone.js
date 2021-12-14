@@ -4,7 +4,7 @@
 class Microphone {
   constructor() {
     this.initialized = false;
-    navigator.mediaDevices.getUserMedia({audio:true})
+    navigator.mediaDevices.getUserMedia({video: false, audio:true})
     .then( function(stream) {
     	this.audioContext = new AudioContext(); //allow us to generate, play and analyse audio
 			this.microphone = this.audioContext.createMediaStreamSource(stream); //takes raw media stream i.e. microphone input for now and convert it into audio nodes
@@ -17,9 +17,14 @@ class Microphone {
     }.bind(this)) //sends this context to the provided value
 		.catch((error) => {
 			alert(error);
-		})
+		});
   }
 
+	
+	/**
+	 * Gets the local audio samples of the current caller
+	 * @returns {array}
+	*/
 	getSamples() {
 		this.analyser.getByteTimeDomainData(this.dataArray); //copies the current waveform or time domain data into Uint8Array
 		let normSamples = [...this.dataArray].map(e => e/128 -1); //normalize between -1 to 1
@@ -37,5 +42,3 @@ class Microphone {
 		return volume;
 	}
 }
-
-const microphone = new Microphone();

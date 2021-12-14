@@ -14,8 +14,7 @@ function main() {
 		}
 		
 		update(micInput) {
-			// this.x = micInput;
-			this.x++;
+			this.height = micInput * 1000;
 		}
 	
 		draw(context) {
@@ -24,12 +23,32 @@ function main() {
 		}
 	}
 	
-	const bar1 = new Bar(10, 10, 100, 150, 'blue');
-	function animate() {
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		bar1.draw(ctx);
-		bar1.update();
+	const microphone = new Microphone();
+	let bars = [];
+	let barWidth = canvas.width / 256;
 
+	function createBars() {
+		for (let i = 0; i < 256; i +=1 ) {
+			let color = 'hsl(' + i * 2 + ', 100%, 50%)';
+			bars.push(new Bar(i * barWidth, canvas.height / 2 , 1, 100, color));
+		}
+	}
+
+	createBars();
+
+	function animate() {
+		if (microphone.initialized) {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+				//generate samples from microphone
+				const samples = microphone.getSamples();
+		
+				//animate bars based on samples
+				bars.forEach( (bar, index) => {
+					bar.update(samples[index]);
+					bar.draw(ctx);
+				})
+			}
 		requestAnimationFrame(animate);
 	}
 
